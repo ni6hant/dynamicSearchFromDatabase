@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Video Data</h1>
+    
+    <form method="POST" action="{{ url_for('videos') }}">
+        <label for="search_term">Search:</label>
+        <input type="text" id="search_term" name="search_term" placeholder="Enter search term">
+        <input type="submit" value="Search">
+    </form>
+
+    <div id="search_results">
+        <!-- Search results will be displayed here -->
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast">Copied to clipboard</div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Function to handle dynamic searching
+            function dynamicSearch() {
+                var search_term = $("#search_term").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url_for('videos') }}",
+                    data: { search_term: search_term },
+                    success: function(data) {
+                        $("#search_results").html(data);
+                    }
+                });
+            }
+
+            // Trigger dynamic search on keyup event
+            $("#search_term").keyup(function() {
+                dynamicSearch();
+            });
+
+            // Function to copy text to clipboard
+            function copyToClipboard(text) {
+                var tempInput = document.createElement("input");
+                tempInput.value = text;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+
+                // Show the toast notification
+                $("#toast").fadeIn().delay(2000).fadeOut();
+            }
+
+            // Event handler for the copy button
+            $(document).on("click", ".copy-button", function() {
+                var textToCopy = $(this).data("copy-text");
+                copyToClipboard(textToCopy);
+            });
+        });
+    </script>
+</body>
+</html>
