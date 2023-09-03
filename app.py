@@ -2,6 +2,7 @@ import mysql.connector
 import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, url_for
+import html
 
 
 app = Flask(__name__)
@@ -34,11 +35,13 @@ def videos():
         if request.method == 'POST':
             # Execute a query to select specific columns and filter by the search term
             query = "SELECT name, url FROM videos WHERE name LIKE %s OR url LIKE %s"
-            cursor.execute(query, ('%' + search_term + '%', '%' + search_term + '%'))
+            search_term = '%' + search_term + '%'
+            cursor.execute(query, (search_term, search_term))
         else:
             # If no search term provided, fetch all data
             query = "SELECT name, url FROM videos"
             cursor.execute(query)
+
 
         # Fetch all the rows from the result set
         rows = cursor.fetchall()
@@ -46,8 +49,8 @@ def videos():
         # Generate HTML table rows for the search results
         rows_html = []
         for row in rows:
-            name = row[0]
-            url = row[1]
+            name = html.escape(row[0])
+            url = html.escape(row[1])
             copy_text = f"{name} {url}"
             row_html = (
                 f"<tr><td>{name}</td><td><a href='{url}'>{url}</a></td>"
