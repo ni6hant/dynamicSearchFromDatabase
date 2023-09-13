@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Video Data</title>
+    <title>Quote Data</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     
-    <form method="POST" action="{{ url_for('videos') }}">
-        <label for="search_term">Videos Search:</label>
+    <form method="POST" action="{{ url_for('quotes') }}">
+        <label for="search_term">Quotes Search:</label>
         <input type="text" id="search_term" name="search_term" placeholder="Enter search term" value="{{ search_term }}">
         <!--<input type="submit" value="Search">-->
     </form>
@@ -19,7 +19,7 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>URL</th>
+                    <th>Quote</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -31,8 +31,7 @@
     <!-- Debug section to display rows_html -->
     <!--<div>
         {{ rows_html }}
-    </div>
--->
+    </div>-->
     <!-- Toast notification -->
     <div id="toast" class="toast">Copied to clipboard</div>
 
@@ -45,7 +44,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "{{ url_for('videos') }}",
+                    url: "{{ url_for('quotes') }}",
                     data: { search_term: search_term },
                     success: function(data) {
                         $("#search_results").html(data);

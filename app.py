@@ -21,9 +21,14 @@ db_config = {
     "database": os.getenv("VIDEOS_DB_DATABASE"),
 }
 
-@app.route('/', methods=['GET', 'POST'])
+# New landing page route
+@app.route('/')
+def landing():
+    return render_template('landing.html')
+
+@app.route('/videos', methods=['GET', 'POST'])
 def videos():
-    search_term = request.form.get('search_term', '')
+    search_term = request.form.get('search_term', request.args.get('search_term', ''))
 
     try:
         # Connect to the database
@@ -67,7 +72,60 @@ def videos():
             return ''.join(rows_html)
         else:
             # Render the full HTML template for initial page load
-            return render_template('videos.html', search_term=search_term)
+            return render_template('videos.html', search_term=search_term, rows_html=''.join(rows_html))
+
+    except mysql.connector.Error as err:
+        return f"Error: {err}"
+
+# Quotes
+@app.route('/quotes', methods=['GET', 'POST'])
+def quotes():
+    search_term = request.form.get('search_term', request.args.get('search_term', ''))
+
+    try:
+        # Connect to the database
+        conn = mysql.connector.connect(**db_config)
+
+        # Create a cursor object to interact with the database
+        cursor = conn.cursor()
+
+        if request.method == 'POST':
+            # Execute a query to select specific columns and filter by the search term
+            query = "SELECT name, quote FROM quotes WHERE name LIKE %s OR quote LIKE %s"
+            search_term = '%' + search_term + '%'
+            cursor.execute(query, (search_term, search_term))
+        else:
+            # If no search term provided, fetch all data
+            query = "SELECT name, quote FROM quotes"
+            cursor.execute(query)
+
+
+        # Fetch all the rows from the result set
+        rows = cursor.fetchall()
+
+        # Generate HTML table rows for the search results
+        rows_html = []
+        for row in rows:
+            name = html.escape(row[0])
+            quote = html.escape(row[1])
+            copy_text = f"{quote}"
+            row_html = (
+                f"<tr><td>{name}</td><td>{quote}</td>"
+                f"<td><button class='copy-button' data-copy-text='{copy_text}'>Copy</button></td></tr>"
+            )
+            rows_html.append(row_html)
+
+        # Close the cursor and connection
+        cursor.close()
+        conn.close()
+
+        # Return the HTML table rows as a string
+        if request.method == 'POST':
+            return ''.join(rows_html)
+        else:
+            # Render the full HTML template for initial page load
+            return render_template('quotes.html', search_term=search_term, rows_html=''.join(rows_html))
+
 
     except mysql.connector.Error as err:
         return f"Error: {err}"

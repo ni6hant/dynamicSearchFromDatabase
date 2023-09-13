@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Landing Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to ni6hant.com 's database search site</h1>
+        <button class="button" onclick="window.location.href='https://www.ni6hant.com'">
+            <h2>Return to site</h2>
+        </button>
+        
+        <button class="button" onclick="loadVideosContent()">Load Videos</button>
+        <button class="button" onclick="loadQuotesContent()">Load Quotes</button>
+    </div>
+    <div>
+        <div id="videos-content">
+            <!-- Content from /videos route will be displayed here -->
+        </div>
+
+        <div id="quotes-content">
+            <!-- Content from /quotes route will be displayed here -->
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function loadVideosContent() {
+            // Use AJAX to load content from /videos route
+            $.ajax({
+                type: "GET",
+                url: "/videos",
+                success: function(data) {
+                    $("#videos-content").html(data).slideDown();
+                    $("#quotes-content").slideUp();
+                }
+            });
+        }
+
+        function loadQuotesContent() {
+            // Use AJAX to load content from /quotes route
+            $.ajax({
+                type: "GET",
+                url: "/quotes",
+                success: function(data) {
+                    $("#quotes-content").html(data).slideDown();
+                    $("#videos-content").slideUp();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
